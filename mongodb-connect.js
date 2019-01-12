@@ -2,12 +2,7 @@ const {MongoClient} = require('mongodb');
 
 const constants= require('./constants')
 
-const url = constants.URL +''+ constants.dbname;
-
-//var obj = new ObjectID();
-
-//console.log(obj);
-
+const url = constants.URL +''+ constants.DBNAME;
 
 MongoClient.connect(url,(err,client) =>
 {
@@ -16,7 +11,7 @@ MongoClient.connect(url,(err,client) =>
     
     console.log('Connected to MongoDB Server');
 
-    const db = client.db(constants.dbname);
+    const db = client.db(constants.DBNAME);
 
     module.exports.db=db;
 

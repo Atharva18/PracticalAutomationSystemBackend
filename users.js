@@ -1,12 +1,11 @@
-var http = require('http');
 const database = require('./mongodb-connect');
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 4020;
+const port = 4021;
 app.use(cors());
 
-app.get('/getById/:id', (req,res) =>
+app.get('/findById/:id', (req,res) =>
 {
   const databaseObject = database.db;
   let mid = parseInt(req.params.id);
@@ -21,7 +20,7 @@ app.get('/getById/:id', (req,res) =>
 }
 )
 
-app.get('/getAll', (req,res) =>
+app.get('/findAll', (req,res) =>
 {
     const databaseObject = database.db;
     databaseObject.collection('users').find().toArray((err,results)=>
