@@ -10,8 +10,7 @@ app.get('/getById/:id', (req,res) =>
 {
   const databaseObject = database.db;
   let mid = parseInt(req.params.id);
-  //console.log(`${mid}`);
-
+ 
   databaseObject.collection('users').find({id:mid}).toArray((err,results)=>
   {
     if(err)
