@@ -5,12 +5,14 @@ const app = express();
 const port = 4020;
 app.use(cors());
 
-app.get('/findById/:id', (req,res) =>
+app.get('/find-user/:type/:username', (req,res) =>
 {
   const databaseObject = database.db;
-  let mid = parseInt(req.params.id);
+
+  let mtype= req.params.type;
+  let username= req.params.username;
  
-  databaseObject.collection('Users').find({id:mid}).toArray((err,results)=>
+  databaseObject.collection('Users').find({roll_type:mtype},{username:username}).toArray((err,results)=>
   {
     if(err)
       res.send('Unable to find ID');
