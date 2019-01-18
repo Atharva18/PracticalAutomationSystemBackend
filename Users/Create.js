@@ -5,12 +5,9 @@ const cors = require('cors');
 const app = express();
 const port = 8011;
 
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
-
-
 app.post('/user-create', (req,res,next)=>
 {
 
