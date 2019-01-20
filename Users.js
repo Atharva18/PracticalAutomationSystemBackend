@@ -1,4 +1,4 @@
-const database = require('../mongodb-connect');
+const database = require('./mongodb-connect');
 const express = require('express');
 const bodyParser= require('body-parser')
 const cors = require('cors');
@@ -8,7 +8,9 @@ const port = 8011;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
-app.post('/user-create', (req,res,next)=>
+
+// Insert to Database
+app.post('/user-create', (req,res)=>
 {
 
     var roll_type= req.body.roll_type;
@@ -27,7 +29,7 @@ app.post('/user-create', (req,res,next)=>
     })
 
 })
-
+//Function 2 for Insert
 var insertToDatabase=(id,req)=>
 {
 
@@ -57,6 +59,7 @@ var insertToDatabase=(id,req)=>
   })
 }
 
+//Function 1 for Insert
   var getid = (roll_type)=>
   {
       return new Promise((resolve,reject)=>
@@ -72,6 +75,63 @@ var insertToDatabase=(id,req)=>
       })
 
   }
+
+// Read entries by type and username
+  app.get('/find-user/:type/:username', (req,res) =>
+  {
+    const databaseObject = database.db;
+  
+    let mtype= req.params.type;
+    let username= req.params.username;
+   
+    databaseObject.collection('Users').find({roll_type:mtype},{username:username}).toArray((err,results)=>
+    {
+      if(err)
+        res.send('Unable to find ID');
+  
+        if(results.length==0)
+          res.send('ID not found');
+  
+      res.send(results);
+    })
+  }
+  )
+  
+// Read all entries
+  app.get('/findAll', (req,res) =>
+  {
+      const databaseObject = database.db;
+      databaseObject.collection('Users').find().toArray((err,results)=>
+      {
+          if(err)
+            res.send('Error!');
+            
+          res.send(results);
+      }
+      );  
+  }
+  )
+//Update Database
+  app.put('/update',(req,res)=>
+  {
+
+    console.log(req);
+    var user=req.body.username;
+
+    const databaseObject= database.db;
+    databaseObject.collection('Users').updateOne({username:user},{$set:req.body},(err,result)=>
+    {
+
+      if(err)
+        res.send('Could not update!');
+
+        res.send('User Updated Successfully');
+
+
+    })
+
+  })
+
 
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
