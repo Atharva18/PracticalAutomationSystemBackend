@@ -2,4 +2,4 @@ Please don't push node modules folder as installations may differ according to t
 
 After you pull the changes, just do 'npm install' , it'll setup node modules on your local machine.
 
-Tables: Role, Users
+API'S Done, Validations and corner cases not done yet.
