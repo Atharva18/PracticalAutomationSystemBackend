@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser= require('body-parser')
 const cors = require('cors');
 const app = express();
-const port = 8011;
+const port = 8012;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -132,6 +132,23 @@ var insertToDatabase=(id,req)=>
 
   })
 
+  //Delete User
+  app.delete('/delete/:username',(req,res)=>
+  {
 
+   // console.log('In delete');
+   // console.log(req.params.username);
+    const databaseObject= database.db;
+    databaseObject.collection('Users').deleteOne({username:req.params.username},(err,result)=>
+    {
+        if(err)
+          res.send('Could not Delete!');
+
+        res.send('User deleted successfully!');
+
+
+    })
+
+  })
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
