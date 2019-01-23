@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser= require('body-parser')
 const cors = require('cors');
 const app = express();
-const port = 8012;
+const port = 8014;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -112,32 +112,30 @@ var insertToDatabase=(id,req)=>
   }
   )
 //Update Database
-  app.put('/update',(req,res)=>
+  app.put('/update-email',(req,res)=>
   {
 
-    console.log(req);
-    var user=req.body.username;
-
+    //console.log(req);
+    let user = req.body.username;
+    var new_email = req.body.email;
     const databaseObject= database.db;
-    databaseObject.collection('Users').updateOne({username:user},{$set:req.body},(err,result)=>
+    databaseObject.collection('Users').updateOne({username:user},{$set:{email: new_email}},(err,result)=>
     {
 
       if(err)
         res.send('Could not update!');
 
-        res.send('User Updated Successfully');
-
+      res.send('User Updated Successfully');
 
     })
-
   })
 
   //Delete User
   app.delete('/delete/:username',(req,res)=>
   {
 
-   // console.log('In delete');
-   // console.log(req.params.username);
+    //console.log('In delete');
+    //console.log(req.params.username);
     const databaseObject= database.db;
     databaseObject.collection('Users').deleteOne({username:req.params.username},(err,result)=>
     {
@@ -145,7 +143,6 @@ var insertToDatabase=(id,req)=>
           res.send('Could not Delete!');
 
         res.send('User deleted successfully!');
-
 
     })
 
