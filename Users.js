@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser= require('body-parser')
 const cors = require('cors');
 const app = express();
-const port = 8014;
+const port = 8012;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -112,14 +112,14 @@ var insertToDatabase=(id,req)=>
   }
   )
 //Update Database
-  app.put('/update-email',(req,res)=>
+  app.put('/update',(req,res)=>
   {
 
-    //console.log(req);
-    let user = req.body.username;
-    var new_email = req.body.email;
+    // console.log(req);
+    var user=req.body.username;
+
     const databaseObject= database.db;
-    databaseObject.collection('Users').updateOne({username:user},{$set:{email: new_email}},(err,result)=>
+    databaseObject.collection('Users').updateOne({username:user},{$set:req.body},(err,result)=>
     {
 
       if(err)
@@ -127,7 +127,9 @@ var insertToDatabase=(id,req)=>
 
       res.send('User Updated Successfully');
 
+
     })
+
   })
 
   //Delete User
@@ -143,6 +145,7 @@ var insertToDatabase=(id,req)=>
           res.send('Could not Delete!');
 
         res.send('User deleted successfully!');
+
 
     })
 
