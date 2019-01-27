@@ -2,15 +2,68 @@ const database = require('./mongodb-connect');
 const express = require('express');
 const bodyParser= require('body-parser')
 const cors = require('cors');
+const multer = require('multer');
+const csv = require('csvtojson');
+//change the path as per your choice
+const upload = multer({ dest: '/home/jay/uploads' });
 const app = express();
-const port = 8012;
+const port = 8026;
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({extended: true});
 app.use(cors());
 
+app.post('/user-multiple', upload.single('file'), function(err, req, res, next)
+{
+    if(err)
+    {
+      console.log("Failed to upload file...");
+    }
+}, function(req, res, next){
+  csv()
+  .fromFile(req.file.path)
+  .subscribe((json)=>
+  {
+    return new Promise((resolve, reject)=>
+    {
+      var roll_type = json.roll_type;
+      getid(roll_type).then((result)=>
+      {
+        var document =
+        {
+          id:result[0]._id,
+          username:json.username,
+          password:json.password,
+          roll_type:json.roll_type,
+          email:json.email,
+          status:"",
+          login_attempts:0,
+          login_timestamp:"",
+          logout_timestamp:""
+        };     
+        database.db.collection("Users").insertOne(document, (err, result) => 
+        {
+          if(err) 
+          {
+            reject('Could not add to database!');
+          }
+          resolve('Document added successfully!');
+        });
+      })
+      .then((result)=>
+      {
+        res.send(result);
+      })
+      .catch((error)=>
+      {
+        res.send(error);
+      })
+    })
+  })
+});
+
 // Insert to Database
-app.post('/user-create', (req,res)=>
+app.post('/user-create', urlencodedParser, jsonParser, (req,res)=>
 {
 
     var roll_type= req.body.roll_type;
@@ -32,7 +85,6 @@ app.post('/user-create', (req,res)=>
 //Function 2 for Insert
 var insertToDatabase=(id,req)=>
 {
-
   return new Promise((resolve,reject)=>
   {
     var document =
@@ -47,7 +99,6 @@ var insertToDatabase=(id,req)=>
         login_timestamp:"",
         logout_timestamp:""
     };
-
     database.db.collection("Users").insertOne(document, (err, result) => 
     {
       if(err) 
@@ -73,7 +124,6 @@ var insertToDatabase=(id,req)=>
           resolve(result);
         })
       })
-
   }
 
 // Read entries by type and username
@@ -88,11 +138,10 @@ var insertToDatabase=(id,req)=>
     {
       if(err)
         res.send('Unable to find ID');
-  
-        if(results.length==0)
-          res.send('ID not found');
-  
-      res.send(results);
+      else if(results.length==0)
+        res.send('ID not found');
+      else
+        res.send(results);
     })
   }
   )
@@ -105,14 +154,13 @@ var insertToDatabase=(id,req)=>
       {
           if(err)
             res.send('Error!');
-            
           res.send(results);
       }
       );  
   }
   )
 //Update Database
-  app.put('/update',(req,res)=>
+  app.put('/update', urlencodedParser, jsonParser, (req,res)=>
   {
 
     // console.log(req);
@@ -124,10 +172,7 @@ var insertToDatabase=(id,req)=>
 
       if(err)
         res.send('Could not update!');
-
       res.send('User Updated Successfully');
-
-
     })
 
   })
@@ -145,8 +190,6 @@ var insertToDatabase=(id,req)=>
           res.send('Could not Delete!');
 
         res.send('User deleted successfully!');
-
-
     })
 
   })
