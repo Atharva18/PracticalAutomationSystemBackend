@@ -13,7 +13,7 @@ const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({extended: true});
 app.use(cors());
 
-app.post('/user-multiple', upload.single('file'), function(err, req, res, next)
+app.post('/user-create-multiple', upload.single('file'), function(err, req, res, next)
 {
     if(err)
     {
@@ -32,6 +32,8 @@ app.post('/user-multiple', upload.single('file'), function(err, req, res, next)
         var document =
         {
           id:result[0]._id,
+          fname:json.fname,
+          lname:json.lname,
           username:json.username,
           password:json.password,
           roll_type:json.roll_type,
@@ -69,7 +71,7 @@ app.post('/user-create', urlencodedParser, jsonParser, (req,res)=>
     var roll_type= req.body.roll_type;
     getid(roll_type).then((result)=>
     {
-     // console.log(result[0]._id);
+      // console.log(result[0]._id);
       return insertToDatabase(result[0]._id,req);
     })
     .then((result)=>
@@ -90,6 +92,8 @@ var insertToDatabase=(id,req)=>
     var document =
     {
         id:id,
+        fname:req.body.fname,
+        lname:req.body.lname,
         username:req.body.username,
         password:req.body.password,
         roll_type:req.body.roll_type,
@@ -157,8 +161,8 @@ var insertToDatabase=(id,req)=>
           res.send(results);
       }
       );  
-  }
-  )
+  })
+
 //Update Database
   app.put('/update', urlencodedParser, jsonParser, (req,res)=>
   {
@@ -193,5 +197,44 @@ var insertToDatabase=(id,req)=>
     })
 
   })
+
+  app.post('/program-create', urlencodedParser, jsonParser, (req, res)=>
+  {
+    return insertProgram(req, res)
+    .then((result)=>
+    {
+        res.send(result);
+    })
+    .catch((error)=>
+    {
+        res.send(error);
+    })
+  })
+
+  var insertProgram = (req, res)=>
+  {
+    return new Promise((resolve,reject)=>
+    {
+      database.db.collection('Programme').findOneAndUpdate({branch: req.body.branch}, {$push: {program: req.body.program}}, {upsert: true}, (err, result)=>
+      {
+        if(err)
+          reject("Failed to create program!");
+        resolve("Programme created successfully!");
+      });
+    })
+  }
+
+  app.get('/program-show', urlencodedParser, jsonParser, (req, res)=>
+  {
+    const databaseObject = database.db;
+    databaseObject.collection('Programme').find().toArray((err, result)=>
+    {
+      if(err)
+        res.send("Error!");
+      else if(result.length == 0)
+        res.send("No program present!");
+      res.send(result);
+    });
+  });
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
