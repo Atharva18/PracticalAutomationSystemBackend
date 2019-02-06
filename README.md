@@ -8,4 +8,6 @@ Collections in Mongo:
 
 1. Users (fname, lname, id, username, password, roll_type, email, status, login_attempts, login_timestamp, logout_timestamp)
 2. Role (Type)
-3. Programme (branch, program[])
+3. Programme (branch, program:[])
+
+'program' is an array. 
