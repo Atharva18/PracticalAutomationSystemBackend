@@ -58,18 +58,36 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
     })
 });
 
+// Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
 {
-  var document = 
-  {
-    Type: req.body.Type,
-    bit: 0
-  };
-  database.db.collection("Role").insertOne(document, (err, result) => {
-    if (err) {
-      res.send('Failed to create Role!');
-    }
-    res.send('Role created successfully!');
+  var bit = 0;
+  database.db.collection('Role').findOneAndUpdate({ Type: req.body.Type }, { $set:{ bit: 0 } }, { upsert: true }, (err, result) => {
+    if (err)
+      res.send("Failed to create Role!");
+    res.send("Role created successfully!");
+  });
+})
+
+//Delete Role
+app.delete('/delete/:Type', (req, res) => 
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Role').deleteOne({ Type: req.params.Type }, (err, result) => {
+    if (err)
+      res.send('Could not Delete!');
+    res.send('Role deleted successfully!');
+  })
+})
+
+// Read all Roles
+app.get('/findAll-role', (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Role').find().toArray((err, results) => {
+    if (err)
+      res.send('Error!');
+    res.send(results);
   });
 })
 
@@ -194,6 +212,7 @@ app.delete('/delete/:username', (req, res) =>
 
 })
 
+// Add program
 app.post('/program-create', urlencodedParser, jsonParser, (req, res) => 
 {
   return insertProgram(req, res)
@@ -216,6 +235,7 @@ var insertProgram = (req, res) =>
   })
 }
 
+// Display all the programs
 app.get('/findAll-program', urlencodedParser, jsonParser, (req, res) => 
 {
   const databaseObject = database.db;
