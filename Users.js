@@ -5,14 +5,14 @@ const cors = require('cors');
 const multer = require('multer');
 const csv = require('csvtojson');
 //change the path as per your choice
-const upload = multer({ dest: '/home/jay/uploads' });
+//const upload = multer({ dest: '/home/jay/uploads' });
 const app = express();
-const port = 8026;
+const port = 8023;
 
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use(cors());
-
+/*
 app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
 {
   if (err) {
@@ -57,15 +57,31 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
       })
     })
 });
-
+*/
 // Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
 {
   var bit = 0;
   database.db.collection('Role').findOneAndUpdate({ Type: req.body.Type }, { $set:{ bit: 0 } }, { upsert: true }, (err, result) => {
     if (err)
-      res.send("Failed to create Role!");
-    res.send("Role created successfully!");
+    {
+     var obj=
+     {
+       result:'Failure',
+       data:null
+     }
+    
+    }
+      else
+      {
+        var obj=
+        {
+          result:'Success',
+          data:req.body.Type
+        }
+        
+      }
+      res.send(obj);
   });
 })
 
