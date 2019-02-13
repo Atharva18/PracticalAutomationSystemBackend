@@ -4,8 +4,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const multer = require('multer');
 const csv = require('csvtojson');
-//change the path as per your choice
-//const upload = multer({ dest: '/home/jay/uploads' });
+const upload = multer({ dest: './uploads' });
 const app = express();
 const port = 8023;
 
@@ -25,6 +24,23 @@ function getResponseObject(result,data)
   return obj;
 }
 
+//Provide preview of CSV file before inserting in DB
+app.post('/csv-preview', upload.single('file'), (req, res, next) => 
+{
+  csv({
+    noheader: true,
+    output: "csv"
+  })
+  .fromFile(req.file.path)
+  .then((csvRow) => 
+  {
+    res.send(csvRow);
+  })
+  .catch((error) =>
+  {
+    res.send(error);
+  })
+})
 
 /*
 app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
