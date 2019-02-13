@@ -6,7 +6,7 @@ const multer = require('multer');
 const csv = require('csvtojson');
 const upload = multer({ dest: './uploads' });
 const app = express();
-const port = 8026;
+const port = 8023;
 
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
@@ -30,7 +30,8 @@ app.post('/csv-preview', upload.single('file'), (req, res, next) =>
   })
 })
 
-/*app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
+/*
+app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
 {
   if (err) {
     console.log("Failed to upload file...");
@@ -73,8 +74,8 @@ app.post('/csv-preview', upload.single('file'), (req, res, next) =>
           })
       })
     })
-});*/
-
+});
+*/
 // Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
 {
