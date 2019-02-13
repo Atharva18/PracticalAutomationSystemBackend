@@ -30,7 +30,7 @@ app.post('/csv-preview', upload.single('file'), (req, res, next) =>
   })
 })
 
-app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
+/*app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
 {
   if (err) {
     console.log("Failed to upload file...");
@@ -73,7 +73,7 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
           })
       })
     })
-});
+});*/
 
 // Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
@@ -81,8 +81,22 @@ app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
   var bit = 0;
   database.db.collection('Role').findOneAndUpdate({ Type: req.body.Type }, { $set:{ bit: 0 } }, { upsert: true }, (err, result) => {
     if (err)
-      res.send("Failed to create Role!");
-    res.send("Role created successfully!");
+    {
+      var obj = 
+      {
+        result: 'Failure',
+        data: null
+      }  
+    }
+    else
+    {
+      var obj = 
+      {
+        result: 'Success',
+        data: req.body.Type
+      }
+    }
+    res.send(obj);
   });
 })
 
