@@ -12,6 +12,20 @@ const port = 8023;
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use(cors());
+
+function getResponseObject(result,data)
+{
+  var obj=
+  {
+    result:result,
+    data:data
+
+  }
+
+  return obj;
+}
+
+
 /*
 app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
 {
@@ -65,22 +79,12 @@ app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
   database.db.collection('Role').findOneAndUpdate({ Type: req.body.Type }, { $set:{ bit: 0 } }, { upsert: true }, (err, result) => {
     if (err)
     {
-     var obj=
-     {
-       result:'Failure',
-       data:null
-     }
-    
+     var obj = getResponseObject('Failure',null);
     }
-      else
-      {
-        var obj=
-        {
-          result:'Success',
-          data:req.body.Type
-        }
-        
-      }
+    else
+    {
+        var obj=getResponseObject('Success',req.body.Type);
+    }
       res.send(obj);
   });
 })
@@ -91,8 +95,8 @@ app.delete('/delete/:Type', (req, res) =>
   const databaseObject = database.db;
   databaseObject.collection('Role').deleteOne({ Type: req.params.Type }, (err, result) => {
     if (err)
-      res.send('Could not Delete!');
-    res.send('Role deleted successfully!');
+      res.send('Failure');
+    res.send('Success');
   })
 })
 
@@ -102,8 +106,16 @@ app.get('/findAll-role', (req, res) =>
   const databaseObject = database.db;
   databaseObject.collection('Role').find().toArray((err, results) => {
     if (err)
-      res.send('Error!');
-    res.send(results);
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+    var obj = getResponseObject('Success',results);
+    }
+
+    res.send(obj);
+
   });
 })
 
@@ -113,14 +125,16 @@ app.post('/user-create', urlencodedParser, jsonParser, (req, res) =>
 
   var roll_type = req.body.roll_type;
   getid(roll_type).then((result) => {
-    // console.log(result[0]._id);
     return insertToDatabase(result[0]._id, req);
   })
     .then((result) => {
-      res.send(result);
+      var obj = getResponseObject('Success',result);
+      res.send(obj);
     })
-    .catch((error) => {
-      res.send(error);
+    .catch((error) =>
+     {
+      var obj = getResponseObject('Failure',null);
+      res.send(obj);
     })
 
 })
@@ -146,7 +160,7 @@ var insertToDatabase = (id, req) =>
       if (err) {
         reject('Could not add to database!');
       }
-      resolve('Document added successfully!');
+      resolve(document);
     });
   })
 }
