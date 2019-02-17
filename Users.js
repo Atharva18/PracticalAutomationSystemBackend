@@ -28,19 +28,20 @@ function getResponseObject(result,data)
 app.post('/csv-preview', upload.single('file'), (req, res, next) => 
 {
   csv({
-    noheader: true,
-    output: "csv"
+    noheader: false,
+    output: "json"
   })
   .fromFile(req.file.path)
   .then((csvRow) => 
   {
-    res.send(csvRow);
+    res.json(csvRow);
   })
   .catch((error) =>
   {
     res.send(error);
   })
 })
+
 
 /*
 app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
