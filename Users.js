@@ -274,7 +274,7 @@ app.post('/program-create', urlencodedParser, jsonParser, (req, res) =>
 var insertProgram = (req, res) => 
 {
   return new Promise((resolve, reject) => {
-    database.db.collection('Programme').findOneAndUpdate({ branch: req.body.branch }, { $push: { program: req.body.program } }, { upsert: true }, (err, result) => {
+    database.db.collection('Programme').findOneAndUpdate({ branch: req.body.branch }, { $push: {program: req.body.program}}, { upsert: true }, (err, result) => {
       if (err)
         reject("Failed to create program!");
       resolve("Programme created successfully!");
