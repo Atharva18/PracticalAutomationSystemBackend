@@ -89,6 +89,53 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
     })
 });
 */
+
+//Add/Update course
+app.post('/course-create', urlencodedParser, jsonParser, (req, res) => {
+  return insertCourse(req, res)
+    .then((result) => {
+      var obj = getResponseObject('Success', result);
+      res.send(obj);
+    })
+    .catch((error) => {
+      var obj = getResponseObject('Failure', error);
+      res.send(obj);
+    })
+})
+
+var insertCourse = (req, res) => {
+  return new Promise((resolve, reject) => {
+    var document =
+    {
+      course: req.body.course,
+      branch: req.body.branch,
+      year: req.body.year,
+      sem: req.body.sem,
+      code: req.body.code
+    }
+    database.db.collection('Course').findOneAndUpdate(document, { $set: { pattern: req.body.pattern } }, { upsert: true }, (err, result) => {
+      if (err)
+        reject("Failure");
+      resolve("Success");
+    })
+  })
+}
+
+//Display Courses
+app.get('/findAll-course', urlencodedParser, jsonParser, (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Course').find().toArray((err, result) => {
+    if (err)
+      res.send("Error!");
+    else if (result.length == 0)
+      res.send("No course present!");
+    res.send(result);
+  });
+
+})
+
+
 // Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
 {
