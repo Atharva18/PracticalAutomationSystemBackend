@@ -197,7 +197,7 @@ var getid = (roll_type) =>
 }
 
 // Read entries by type and username
-app.get('/find-user/:type/:username', (req, res) => 
+app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) => 
 {
   const databaseObject = database.db;
 
@@ -214,8 +214,32 @@ app.get('/find-user/:type/:username', (req, res) =>
   })
 })
 
+app.post('/findType', urlencodedParser, jsonParser, (req, res) =>
+{
+  const databaseObject = database.db;
+  let username = req.body.username;
+  let password = req.body.password;
+  databaseObject.collection('Users').find({username: {$eq: username}, password: {$eq: password}}, { projection: { _id: 0, roll_type: 1 } }).toArray((err, results) =>
+  {
+    if(err)
+    {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (results.length == 0)
+    {
+      var obj = getResponseObject('Wrong username or password', null);
+    }
+    else
+    {
+      var obj = getResponseObject('Success', results);
+    }
+    res.send(obj);
+  })
+
+})
+
 // Read all entries
-app.get('/findAll', (req, res) => 
+app.get('/findAll', urlencodedParser, jsonParser, (req, res) => 
 {
   const databaseObject = database.db;
   databaseObject.collection('Users').find().toArray((err, results) => {
