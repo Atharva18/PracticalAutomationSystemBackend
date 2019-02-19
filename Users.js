@@ -214,6 +214,7 @@ app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) =
   })
 })
 
+//Returns roll_type if username and password are correct 
 app.post('/findType', urlencodedParser, jsonParser, (req, res) =>
 {
   const databaseObject = database.db;
