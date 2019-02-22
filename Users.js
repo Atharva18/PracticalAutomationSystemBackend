@@ -184,24 +184,36 @@ app.get('/findAll-role', (req, res) =>
 })
 
 // Insert to Database
-app.post('/user-create', urlencodedParser, jsonParser, (req, res) => 
-{
+app.post('/user-create', urlencodedParser, jsonParser, (req, res) => {
 
+  var username = req.body.username;
   var roll_type = req.body.roll_type;
-  getid(roll_type).then((result) => {
-    return insertToDatabase(result[0]._id, req);
+  var count = 0;
+  database.db.collection('Users').find({ username: { $eq: username } }).count((err, results) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+      res.send(obj);
+    }
+    if (results > 0) {
+      var obj = getResponseObject('User already exists', null);
+      res.send(obj);
+    }
+    else {
+      getid(roll_type).then((result) => {
+        return insertToDatabase(result[0]._id, req);
+      })
+        .then((result) => {
+          var obj = getResponseObject('Success', result);
+          res.send(obj);
+        })
+        .catch((error) => {
+          var obj = getResponseObject('Failure', null);
+          res.send(obj);
+        })
+    }
   })
-    .then((result) => {
-      var obj = getResponseObject('Success',result);
-      res.send(obj);
-    })
-    .catch((error) =>
-     {
-      var obj = getResponseObject('Failure',null);
-      res.send(obj);
-    })
-
 })
+
 //Function 2 for Insert
 var insertToDatabase = (id, req) => 
 {
