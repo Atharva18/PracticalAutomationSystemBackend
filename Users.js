@@ -225,7 +225,6 @@ var insertToDatabase = (id, req) =>
       lname: req.body.lname,
       username: req.body.username,
       password: req.body.password,
-      roll_type: req.body.roll_type,
       email: req.body.email,
       status: "",
       login_attempts: 0,
@@ -274,29 +273,49 @@ app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) =
 })
 
 //Returns roll_type if username and password are correct 
-app.post('/findType', urlencodedParser, jsonParser, (req, res) =>
-{
+app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
   const databaseObject = database.db;
   let username = req.body.username;
   let password = req.body.password;
-  databaseObject.collection('Users').find({username: {$eq: username}, password: {$eq: password}}, { projection: { _id: 0, roll_type: 1 } }).toArray((err, results) =>
-  {
-    if(err)
-    {
+  databaseObject.collection('Users').find({ username: { $eq: username }, password: { $eq: password } }, { projection: { _id: 0, id: 1 } }).toArray((err, results) => {
+    if (err) {
       var obj = getResponseObject('Failure', null);
+      res.send(obj);
     }
-    else if (results.length == 0)
-    {
+    else if (results.length == 0) {
       var obj = getResponseObject('Wrong username or password', null);
+      res.send(obj);
     }
-    else
-    {
-      var obj = getResponseObject('Success', results);
+    else {
+      return getrole(results[0].id)
+      .then((result) =>
+      {
+        var obj = getResponseObject('Success', result);
+        res.send(obj);
+      })
+      .catch((error) =>
+      {
+        var obj = getResponseObject('Failure', error);
+        res.send(obj);
+      })
+      //var obj = getResponseObject('Success', results);
     }
-    res.send(obj);
   })
-
 })
+
+var getrole = (id) =>{
+  return new Promise((resolve, reject) =>
+  {
+    const databaseObject = database.db;
+    databaseObject.collection('Role').find({ _id: id }, { projection: { _id: 0, Type: 1 } }).toArray((err, result) =>
+    {
+      if(err)
+        reject("Failed to obtain ID");
+      resolve(result);
+    })
+  })
+}
+
 
 // Read all entries
 app.get('/findAll', urlencodedParser, jsonParser, (req, res) => 
