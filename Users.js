@@ -365,28 +365,20 @@ app.delete('/delete/:username', (req, res) =>
 // Add program
 app.post('/program-create', urlencodedParser, jsonParser, (req, res) => 
 {
-  return insertProgram(req, res)
-    .then((result) => {
-      var obj = getResponseObject('Success',result);
-      res.send(obj);
-    })
-    .catch((error) => {
-      var obj = getResponseObject('Failure',error);
-      res.send(obj);
-    })
+  const branch = req.body.branch
+  const Year = req.body.program
+  database.db.collection('Programme').findOneAndUpdate({ branch: branch }, { $push: {program: {Year}} }, { upsert: true, returnOriginal: false }, (err, result) => {
+    if (err)
+    {
+      var obj = getResponseObject('Failure', error)
+    }
+    else
+    { 
+      var obj = getResponseObject('Success', result.value)
+    }
+    res.send(obj);
+  });
 })
-
-var insertProgram = (req, res) => 
-{
-  return new Promise((resolve, reject) => {
-    database.db.collection('Programme').findOneAndUpdate({ branch: req.body.branch }, { $push: {program: req.body.program}}, { upsert: true }, (err, result) => {
-      if (err)
-      
-        reject("Failure");
-      resolve("Success");
-    });
-  })
-}
 
 // Display all the programs
 app.get('/findAll-program', urlencodedParser, jsonParser, (req, res) => 
