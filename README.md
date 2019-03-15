@@ -9,7 +9,9 @@ Collections in Mongo:
 1. Users (fname, lname, id, username, password, roll_type, email, status, login_attempts, login_timestamp, logout_timestamp)
 2. Role (Type)
 3. Programme (branch, program:[])
+
+'program' is an array. 
+
 4. Course(branch, code, course, sem, year, pattern)
 5. Branch (Type)
 6. Department (Type)
-'program' is an array. 
