@@ -10,5 +10,6 @@ Collections in Mongo:
 2. Role (Type)
 3. Programme (branch, program:[])
 4. Course(branch, code, course, sem, year, pattern)
-
+5. Branch (Type)
+6. Department (Type)
 'program' is an array. 

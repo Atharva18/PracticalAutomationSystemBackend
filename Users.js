@@ -139,7 +139,7 @@ app.get('/findAll-course', urlencodedParser, jsonParser, (req, res) =>
 app.post('/branch-create', urlencodedParser, jsonParser, (req, res)=>
 {
   var bit = 0;
-  database.db.collection('Branch').findOneAndUpdate({ Type: req.body.Type },{ upsert: true }, (err, result) => {
+  database.db.collection('Branch').insertOne({ Type: req.body.Type }, { upsert: true }, (err, result) => {
     if (err)
     {
      var obj = getResponseObject('Failure',null);
@@ -152,7 +152,7 @@ app.post('/branch-create', urlencodedParser, jsonParser, (req, res)=>
   });
 })
 
-//Delete Role
+//Delete Branch
 app.delete('/delete-branch/:Type', (req, res) => 
 {
   const databaseObject = database.db;
@@ -168,6 +168,54 @@ app.get('/findAll-branch', (req, res) =>
 {
   const databaseObject = database.db;
   databaseObject.collection('Branch').find().toArray((err, results) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+    var obj = getResponseObject('Success',results);
+    }
+
+    res.send(obj);
+
+  });
+})
+
+
+//Add/Update new Department
+app.post('/department-create', urlencodedParser, jsonParser, (req, res)=>
+{
+  var bit = 0;
+  database.db.collection('Department').insertOne({ Type: req.body.Type }, { upsert: true }, (err, result) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+        var obj=getResponseObject('Success',req.body.Type);
+    }
+      res.send(obj);
+  });
+})
+
+//Delete Department
+app.delete('/delete-department/:Type', (req, res) => 
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Department').deleteOne({ Type: req.params.Type }, (err, result) => {
+    if (err)
+      res.send('Failure');
+    res.send('Success');
+  })
+})
+
+// Read all Departments
+app.get('/findAll-department', (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Department').find().toArray((err, results) => {
     if (err)
     {
      var obj = getResponseObject('Failure',null);
