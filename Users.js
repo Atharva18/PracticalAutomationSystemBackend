@@ -135,6 +135,71 @@ app.get('/findAll-course', urlencodedParser, jsonParser, (req, res) =>
 
 })
 
+//Add/Update new branch
+app.post('/branch-create', urlencodedParser, jsonParser, (req, res)=>
+{
+  var bit = 0;
+  database.db.collection('Branch').findOneAndUpdate({ Type: req.body.Type },{ upsert: true }, (err, result) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+        var obj=getResponseObject('Success',req.body.Type);
+    }
+      res.send(obj);
+  });
+})
+
+//Delete Role
+app.delete('/delete-branch/:Type', (req, res) => 
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Branch').deleteOne({ Type: req.params.Type }, (err, result) => {
+    if (err)
+      res.send('Failure');
+    res.send('Success');
+  })
+})
+
+// Read all Branches
+app.get('/findAll-branch', (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Branch').find().toArray((err, results) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+    var obj = getResponseObject('Success',results);
+    }
+
+    res.send(obj);
+
+  });
+})
+
+// Read all Roles
+app.get('/findAll-role', (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Role').find().toArray((err, results) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+    var obj = getResponseObject('Success',results);
+    }
+
+    res.send(obj);
+
+  });
+})
 
 // Add/Update new role
 app.post('/role-create', urlencodedParser, jsonParser, (req, res)=>
