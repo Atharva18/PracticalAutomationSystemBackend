@@ -12,6 +12,19 @@ const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
 app.use(cors());
 
+const storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './uploads')
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.originalname)
+  }
+})
+
+var fileName = '';
+const upload = multer({ storage: storage })
+
+
 function getResponseObject(result,data)
 {
   var obj=
@@ -42,20 +55,15 @@ app.post('/csv-preview', upload.single('file'), (req, res, next) =>
   })
 })
 
-
-/*
-app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) => 
-{
-  if (err) {
-    console.log("Failed to upload file...");
-  }
-}, (req, res, next) => 
-{
+//add entries from csv to database
+app.post('/addfrom-csv', urlencodedParser, jsonParser, (req, res) => {
+  var csvFilePath = __dirname + '/uploads/' + fileName;
+  console.log(csvFilePath);
   csv()
-    .fromFile(req.file.path)
+    .fromFile(csvFilePath)
     .subscribe((json) => {
       return new Promise((resolve, reject) => {
-        var roll_type = json.roll_type;
+        var roll_type = "user";
         return getid(roll_type)
           .then((result) => {
             var document =
@@ -64,8 +72,6 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
               fname: json.fname,
               lname: json.lname,
               username: json.username,
-              password: json.password,
-              roll_type: json.roll_type,
               email: json.email,
               status: "",
               login_attempts: 0,
@@ -76,19 +82,18 @@ app.post('/user-create-multiple', upload.single('file'), (err, req, res, next) =
               if (err) {
                 reject('Could not add to database!');
               }
-              resolve('Document added successfully!');
+              else {
+                resolve('Document added successfully!');
+              }
             });
           })
           .then((result) => {
             res.send(result);
           })
-          .catch((error) => {
-            res.send(error);
-          })
       })
-    })
+    });
 });
-*/
+
 
 //Add/Update course
 app.post('/course-create', urlencodedParser, jsonParser, (req, res) => {
