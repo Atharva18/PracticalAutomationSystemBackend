@@ -4,7 +4,6 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const multer = require('multer');
 const csv = require('csvtojson');
-const upload = multer({ dest: './uploads' });
 const app = express();
 const port = 8023;
 
