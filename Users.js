@@ -414,8 +414,7 @@ app.get('/find-users', urlencodedParser, jsonParser, (req, res) => {
           res.send(obj);
         }
         else {
-          const obj = getResponseObject('Success', result);
-          res.send(obj);
+          res.send(result);
         }
       })
     }
