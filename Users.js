@@ -6,9 +6,10 @@ const multer = require('multer');
 const csv = require('csvtojson');
 const app = express();
 const port = 8023;
-
+var usbDetect = require('usb-detection');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
+const BrowserHistory = require('node-browser-history');
 app.use(cors());
 
 const storage = multer.diskStorage({
@@ -23,6 +24,13 @@ const storage = multer.diskStorage({
 var fileName = '';
 const upload = multer({ storage: storage })
 
+
+ 
+usbDetect.startMonitoring();
+ 
+usbDetect.on('add', function(device) {
+    console.log(device);
+});
 
 function getResponseObject(result,data)
 {
