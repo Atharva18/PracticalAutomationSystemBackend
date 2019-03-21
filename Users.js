@@ -390,6 +390,39 @@ app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) =
   })
 })
 
+//Returns users of a particular role
+app.get('/find-users', urlencodedParser, jsonParser, (req, res) => {
+  let id;
+  database.db.collection('Role').findOne({ Type: 'user' }, (err, results) => {
+    if (err) {
+      const obj = getResponseObject('Failure', null);
+      res.send(obj);
+    }
+    else if (results.length == 0) {
+      const obj = getResponseObject('Role does not exist', null);
+      res.send(obj);
+    }
+    else {
+      id = results["_id"];
+      database.db.collection('Users').find({ id: id }, { projection: {_id: 0, fname: 1, lname: 1, username: 1, email: 1} }).toArray((err, result) => {
+        if (err) {
+          const obj = getResponseObject('Failure', null);
+          res.send(obj);
+        }
+        else if (result.length == 0) {
+          const obj = getResponseObject('Users not found.', null);
+          res.send(obj);
+        }
+        else {
+          const obj = getResponseObject('Success', result);
+          res.send(obj);
+        }
+      })
+    }
+  })
+})
+
+
 //Returns roll_type if username and password are correct 
 app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
   const databaseObject = database.db;
