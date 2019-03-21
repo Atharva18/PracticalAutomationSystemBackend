@@ -301,6 +301,39 @@ app.get('/findAll-role', (req, res) =>
   });
 })
 
+//Add bulk entries
+app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
+  var entries = req.body;
+  getid('user').then((result) => {
+    return insertManyToDB(result[0]._id, entries)
+  })
+  .then((result) => {
+    const obj = getResponseObject("Success", result);
+    res.send(obj)
+  })
+  .catch((error) => {
+    var obj = getResponseObject('Failure', null);
+    res.send(obj);
+  })
+})
+
+//function 1 to add bulk entries 
+var insertManyToDB = (id, entries) => {
+  for(var i = 0; i < entries.length; i++){
+    entries[i]['id'] = id;
+  }
+  return new Promise((resolve, reject) => {
+    database.db.collection('Users').insertMany(entries, (err, result) => {
+      if(err){
+        reject(err)
+      }
+      else{
+        resolve(result)
+      }
+    })
+  })
+}
+
 // Insert to Database
 app.post('/user-create', urlencodedParser, jsonParser, (req, res) => {
 
