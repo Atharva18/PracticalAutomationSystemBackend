@@ -238,6 +238,7 @@ app.get('/findAll-department', (req, res) =>
 app.get('/findAll-role', (req, res) =>
 {
   const databaseObject = database.db;
+  console.log("in findall role1");
   databaseObject.collection('Role').find().toArray((err, results) => {
     if (err)
     {
@@ -247,7 +248,7 @@ app.get('/findAll-role', (req, res) =>
     {
     var obj = getResponseObject('Success',results);
     }
-
+    console.log("in findall role1");
     res.send(obj);
 
   });
@@ -509,5 +510,29 @@ app.get('/findAll-program', urlencodedParser, jsonParser, (req, res) =>
     res.send(result);
   });
 });
+
+app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
+  const databaseObject = database.db;
+  let branch = req.body.branch;
+  let year = req.body.year;
+  let sem = req.body.sem;
+  databaseObject.collection('Course').find({ branch: { $eq: branch }, year: { $eq: year } , sem: { $eq: sem } },  { projection: { _id: 0, course: 1 } }).toArray((err, results) => {
+    
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+      res.send(obj);
+    }
+    else if (results.length == 0) {
+      var obj = getResponseObject('Wrong data provided', null);
+      res.send(obj);
+    }
+    else {
+        var obj = getResponseObject('Success', results);
+        res.send(obj);
+      }
+      //var obj = getResponseObject('Success', results);
+    
+    })
+  })
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
