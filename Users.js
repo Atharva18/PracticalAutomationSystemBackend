@@ -311,8 +311,9 @@ app.get('/findAll-role', (req, res) =>
 
 //Add bulk entries
 app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
-  var entries = req.body;
-  getid('user').then((result) => {
+  var type = req.body.Type;
+  var entries = req.body.entries;
+  getid(type).then((result) => {
     return insertManyToDB(result[0]._id, entries)
   })
   .then((result) => {
