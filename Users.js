@@ -9,7 +9,7 @@ const port = 8023;
 var usbDetect = require('usb-detection');
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: true });
-const BrowserHistory = require('node-browser-history');
+//const BrowserHistory = require('node-browser-history');
 app.use(cors());
 
 const storage = multer.diskStorage({
@@ -435,6 +435,10 @@ app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) =
 //Returns students of a particular branch and year
 app.get('/find-users/:branch/:year', urlencodedParser, jsonParser, (req, res) => {
   let id;
+  var branch=req.params.branch;
+  var year= req.params.year;
+  console.log(req.params.branch);
+  console.log(req.params.year);
   database.db.collection('Role').findOne({ Type: 'user' }, (err, results) => {
     if (err) {
       const obj = getResponseObject('Failure', null);
@@ -446,7 +450,7 @@ app.get('/find-users/:branch/:year', urlencodedParser, jsonParser, (req, res) =>
     }
     else {
       id = results["_id"];
-      database.db.collection('Users').find({ id: id, branch: req.params.branch, year: req.params.year }, { projection: { _id: 0, fname: 1, lname: 1, branch: 1, year: 1 } }).toArray((err, result) => {
+      database.db.collection('Users').find({ id: {$eq:id},  branch: { $eq: branch }, year: { $eq: year } }  , { projection: { _id: 0, fname: 1, lname: 1,email:1, branch: 1, year: 1 } }).toArray((err, result) => {
         if (err) {
           const obj = getResponseObject('Failure', null);
           res.send(obj);
