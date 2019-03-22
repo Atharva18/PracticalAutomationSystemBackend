@@ -433,7 +433,7 @@ app.get('/find-user/:type/:username', urlencodedParser, jsonParser, (req, res) =
 })
 
 //Returns students of a particular branch and year
-app.get('/find-users', urlencodedParser, jsonParser, (req, res) => {
+app.get('/find-users/:branch/:year', urlencodedParser, jsonParser, (req, res) => {
   let id;
   database.db.collection('Role').findOne({ Type: 'user' }, (err, results) => {
     if (err) {
@@ -446,7 +446,7 @@ app.get('/find-users', urlencodedParser, jsonParser, (req, res) => {
     }
     else {
       id = results["_id"];
-      database.db.collection('Users').find({ id: id, branch: req.body.branch, year: req.body.year }, { projection: { _id: 0, fname: 1, lname: 1, branch: 1, year: 1 } }).toArray((err, result) => {
+      database.db.collection('Users').find({ id: id, branch: req.params.branch, year: req.params.year }, { projection: { _id: 0, fname: 1, lname: 1, branch: 1, year: 1 } }).toArray((err, result) => {
         if (err) {
           const obj = getResponseObject('Failure', null);
           res.send(obj);
@@ -462,6 +462,7 @@ app.get('/find-users', urlencodedParser, jsonParser, (req, res) => {
     }
   })
 })
+
 
 //Returns roll_type if username and password are correct 
 app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
