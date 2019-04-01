@@ -47,6 +47,7 @@ function getResponseObject(result,data)
 //Provide preview of CSV file before inserting in DB
 app.post('/csv-preview', upload.single('file'), (req, res, next) => 
 {
+  fileName = req.file.originalname;
   csv({
     noheader: false,
     output: "json"
