@@ -312,8 +312,9 @@ app.get('/findAll-role', (req, res) =>
 
 //Add bulk entries
 app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
-  var entries = req.body;
-  getid('user').then((result) => {
+  var entries = req.body.students;
+
+  getexamid('user').then((result) => {
     return insertManyToDB(result[0]._id, entries)
   })
   .then((result) => {
@@ -330,10 +331,10 @@ app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
 //function 1 to add bulk entries 
 var insertManyToDB = (id, entries) => {
   for(var i = 0; i < entries.length; i++){
-    entries[i]['id'] = id;
+    entries[i]['examid'] = id;
   }
   return new Promise((resolve, reject) => {
-    database.db.collection('Users').insertMany(entries, (err, result) => {
+    database.db.collection('Exam-student').insertMany(entries, (err, result) => {
       if(err){
         reject(err)
       }
@@ -438,8 +439,6 @@ app.get('/find-users/:branch/:year', urlencodedParser, jsonParser, (req, res) =>
   let id;
   var branch=req.params.branch;
   var year= req.params.year;
-  console.log(req.params.branch);
-  console.log(req.params.year);
   database.db.collection('Role').findOne({ Type: 'user' }, (err, results) => {
     if (err) {
       const obj = getResponseObject('Failure', null);
@@ -611,6 +610,18 @@ app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
       }
       //var obj = getResponseObject('Success', results);
     
+    })
+  })
+
+  app.post('/exam-create', urlencodedParser, jsonParser, (req, res) => {
+    database.db.collection('Exam').findOneAndUpdate({ _id: req.body.exam_id }, { $set : { course: req.body.course, exam_name: req.body.exam_name, start_date: req.body.start_date, end_date: req.body.end_date, status: "Not completed" } }, {upsert: true}, (err, result) => {
+      if(err){
+        var obj = getResponseObject("Failed to create exam.", null);
+      }
+      else{
+        var obj = getResponseObject("Exam created successfully!", result);
+      }
+      res.send(obj)
     })
   })
 
