@@ -614,15 +614,42 @@ app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
   })
 
   app.post('/exam-create', urlencodedParser, jsonParser, (req, res) => {
-    database.db.collection('Exam').findOneAndUpdate({ _id: req.body.exam_id }, { $set : { course: req.body.course, exam_name: req.body.exam_name, start_date: req.body.start_date, end_date: req.body.end_date, status: "Not completed" } }, {upsert: true}, (err, result) => {
-      if(err){
-        var obj = getResponseObject("Failed to create exam.", null);
-      }
-      else{
-        var obj = getResponseObject("Exam created successfully!", result);
-      }
+    return getunicode(req.body.course)
+    .then((result) => {
+      return insertToExamTable(result[0].code, req)
+    })
+    .then((result) => {
+      var obj = getResponseObject("Exam created successfully!", result)
+      res.send(obj)
+    })
+    .catch((err) => {
+      var obj = getResponseObject("Failed to create exam", null)
       res.send(obj)
     })
   })
+
+  var getunicode = (course) => {
+    return new Promise((resolve, reject) => {
+      database.db.collection('Course').find({course : course}).toArray((err, result) => {
+        if(err){
+          reject("Failed to obtain University Subject code.")
+        }
+        resolve(result)
+      })
+    })
+  }
+
+  var insertToExamTable = (code, req) => {
+    return new Promise((resolve, reject) => {
+      database.db.collection('Exam').findOneAndUpdate({ _id: code }, { $set : { course: req.body.course, exam_name: req.body.exam_name, start_date: req.body.start_date, end_date: req.body.end_date, status: "Not completed" } }, {upsert: true}, (err, result) => {
+        if(err){
+          reject("Error");
+        }
+        else{
+          resolve("Success");
+        }
+      })
+    })
+  }
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
