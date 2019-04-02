@@ -15,3 +15,4 @@ Collections in Mongo:
 4. Course(branch, code, course, sem, year, pattern)
 5. Branch (Type)
 6. Department (Type)
+7. Exam (course, exam_name, start_date, end_date, status)
