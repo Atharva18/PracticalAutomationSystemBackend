@@ -654,5 +654,41 @@ app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
       })
     })
   }
+  
+  //Add bulk entries
+app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
+  var course = req.body.subject;
+
+  getunicode(course).then((result) => {
+    return insertManyToDB(result[0].code, req)
+  })
+  .then((result) => {
+    const obj = getResponseObject("Success", result);
+    res.send(obj)
+  })
+  .catch((error) => {
+    var obj = getResponseObject('Failure', null);
+    res.send(obj);
+  })
+})
+
+
+//function 1 to add bulk entries 
+var insertManyToDB = (id, req) => {
+  var data = req.body;
+  data['examid'] = id;
+  console.log(data)
+  return new Promise((resolve, reject) => {
+    database.db.collection('Exam-student').insertOne(data, (err, result) => {
+      if(err){
+        reject(err)
+      }
+      else{
+        resolve(result)
+      }
+    })
+  })
+}
+
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
