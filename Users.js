@@ -415,7 +415,7 @@ app.get('/find-users/:branch/:year', urlencodedParser, jsonParser, (req, res) =>
     }
     else {
       id = results["_id"];
-      database.db.collection('Users').find({ id: {$eq:id},  branch: { $eq: branch }, year: { $eq: year } }  , { projection: { _id: 0, fname: 1, lname: 1,email:1, branch: 1, year: 1 } }).toArray((err, result) => {
+      database.db.collection('Users').find({ id: {$eq:id},  branch: { $eq: branch }, year: { $eq: year } }  , { projection: { _id: 1, fname: 1, lname: 1,email:1, branch: 1, year: 1 } }).toArray((err, result) => {
         if (err) {
           const obj = getResponseObject('Failure', null);
           res.send(obj);
