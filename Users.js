@@ -642,10 +642,9 @@ app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
   var insertToExamTable = (code, req) => {
     return new Promise((resolve, reject) => {
       var date = req.body.date;
-      date = date.split(",");
       var start_date = date[0];
       var end_date = date[1];
-      database.db.collection('Exam').findOneAndUpdate({ _id: code }, { $set : { course: req.body.course, exam_name: req.body.exam_name, start_date: req.body.start_date, end_date: req.body.end_date, status: "Not completed" } }, {upsert: true}, (err, result) => {
+      database.db.collection('Exam').findOneAndUpdate({ _id: code }, { $set : { course: req.body.course, exam_name: req.body.exam_name, start_date: start_date, end_date: end_date, status: "Not completed" } }, {upsert: true}, (err, result) => {
         if(err){
           reject("Error");
         }
