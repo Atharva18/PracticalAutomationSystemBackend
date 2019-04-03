@@ -658,6 +658,7 @@ var insertManyToDB = (id, req) => {
 //Add Problem Statement
 app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) => {
 
+  console.log('in Addproblem');
   return getunicode(req.body.course)
     .then((result) => {
       return insertToExamTopic(result[0].code, req)
@@ -694,6 +695,25 @@ app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) =
       })
      
 }
+
+//Display Available exam
+app.get('/findAll-exam', (req, res) =>
+{
+  const databaseObject = database.db;
+  databaseObject.collection('Exam').find().toArray((err, results) => {
+    if (err)
+    {
+     var obj = getResponseObject('Failure',null);
+    }
+    else
+    {
+    var obj = getResponseObject('Success',results);
+    }
+
+    res.send(obj);
+
+  });
+})
 
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
