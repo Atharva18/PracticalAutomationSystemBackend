@@ -723,7 +723,7 @@ app.get('/findAll-exam', (req, res) =>
         res.send(obj);
       }
       else if(result.length == 0){
-        var obj = getResponseObject("Exam does not exist", null);
+        var obj = getResponseObject("Failure", null);
         res.send(obj);
       }
       else{
