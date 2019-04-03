@@ -310,41 +310,6 @@ app.get('/findAll-role', (req, res) =>
   });
 })
 
-//Add bulk entries
-app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
-  var entries = req.body.students;
-
-  getexamid('user').then((result) => {
-    return insertManyToDB(result[0]._id, entries)
-  })
-  .then((result) => {
-    const obj = getResponseObject("Success", result);
-    res.send(obj)
-  })
-  .catch((error) => {
-    var obj = getResponseObject('Failure', null);
-    res.send(obj);
-  })
-})
-
-
-//function 1 to add bulk entries 
-var insertManyToDB = (id, entries) => {
-  for(var i = 0; i < entries.length; i++){
-    entries[i]['examid'] = id;
-  }
-  return new Promise((resolve, reject) => {
-    database.db.collection('Exam-student').insertMany(entries, (err, result) => {
-      if(err){
-        reject(err)
-      }
-      else{
-        resolve(result)
-      }
-    })
-  })
-}
-
 // Insert to Database
 app.post('/user-create', urlencodedParser, jsonParser, (req, res) => {
 
@@ -688,6 +653,46 @@ var insertManyToDB = (id, req) => {
       }
     })
   })
+}
+
+//Add Problem Statement
+app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) => {
+
+  return getunicode(req.body.course)
+    .then((result) => {
+      return insertToExamTopic(result[0].code, req)
+    })
+    .then((result) => {
+      var obj = getResponseObject("Problem statement added succesfully", result)
+      res.send(obj)
+    })
+    .catch((err) => {
+      var obj = getResponseObject("Failed to add statements", null)
+      res.send(obj)
+    })
+  })
+ 
+    var insertToExamTopic = (code, req) => {
+      return new Promise((resolve, reject) => {
+        var document =
+    {
+      exam_id: code,
+      course: req.body.course,
+      statement: req.body.statement
+      
+      
+  
+    }
+        database.db.collection('Exam-Topic').insertOne(document, (err, result)  => {
+          if(err){
+            reject("Error");
+          }
+          else{
+            resolve("Success");
+          }
+        })
+      })
+     
 }
 
 
