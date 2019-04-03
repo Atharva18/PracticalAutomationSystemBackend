@@ -16,3 +16,5 @@ Collections in Mongo:
 5. Branch (Type)
 6. Department (Type)
 7. Exam (course, exam_name, start_date, end_date, status)
+8. Exam-Topic(exam_id,course,statement)
+9. Exam-student(user[],branch,year,subject,code)
