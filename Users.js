@@ -716,4 +716,22 @@ app.get('/findAll-exam', (req, res) =>
 })
 
 
+  app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, (req, res) => {
+    database.db.collection('Exam-student').find({ branch: { $eq: req.params.branch }, year: { $eq: req.params.year }, subject: { $eq:req.params.subject } }, {projection: {_id: 0, user: 1}}).toArray((err, result) => {
+      if(err){
+        var obj = getResponseObject("Failed to obtain enrolled students", null);
+        res.send(obj);
+      }
+      else if(result.length == 0){
+        var obj = getResponseObject("Exam does not exist", null);
+        res.send(obj);
+      }
+      else{
+        res.send(result);
+      }
+    })
+  })
+
+
+
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
