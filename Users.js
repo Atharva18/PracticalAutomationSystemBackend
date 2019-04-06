@@ -82,6 +82,8 @@ app.post('/addfrom-csv', urlencodedParser, jsonParser, (req, res) => {
               username: json.username,
               email: json.email,
               status: "",
+              branch:json.branch,
+              year:json.year,
               login_attempts: 0,
               login_timestamp: "",
               logout_timestamp: ""
