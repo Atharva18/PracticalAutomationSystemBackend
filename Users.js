@@ -642,18 +642,32 @@ app.post('/user-enrol', urlencodedParser, jsonParser, (req, res) => {
 var insertManyToDB = (id, req) => {
   var data = req.body;
   data['examid'] = id;
-  console.log(data)
   return new Promise((resolve, reject) => {
-    database.db.collection('Exam-student').insertOne(data, (err, result) => {
-      if(err){
-        reject(err)
+    database.db.collection('Exam-student').find({ examid: id }).toArray((err, result) => {
+      if(result.length == 1){
+        database.db.collection('Exam-student').updateOne({ examid: id }, { $addToSet: { user: { $each: req.body.user } } } , { upsert: true }, (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          else {
+            resolve(result)
+          }    
+        })    
       }
-      else{
-        resolve(result)
+      else if(result.length == 0){
+        database.db.collection('Exam-student').insertOne(data, (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          else {
+            resolve(result)
+          }   
+        })
       }
     })
   })
 }
+
 
 //Add Problem Statement
 app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) => {
