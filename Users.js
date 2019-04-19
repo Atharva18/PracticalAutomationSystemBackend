@@ -80,6 +80,7 @@ app.post('/addfrom-csv', urlencodedParser, jsonParser, (req, res) => {
               fname: json.fname,
               lname: json.lname,
               username: json.username,
+              password:json.password,
               email: json.email,
               status: "",
               branch:json.branch,
