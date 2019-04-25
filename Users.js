@@ -398,6 +398,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
   const databaseObject = database.db;
   let username = req.body.username;
   let password = req.body.password;
+  var now = new Date();
   databaseObject.collection('Users').find({ username: { $eq: username }, password: { $eq: password } }, { projection: { _id: 0, id: 1 } }).toArray((err, results) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
@@ -410,6 +411,11 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
     else {
       return getrole(results[0].id)
         .then((result) => {
+          database.db.collection('Users').findOneAndUpdate({ username: { $eq: username}, password: { $eq: password } }, { $set: { login_timestamp: now.toUTCString() } }, (err, result) => {
+            if (err) {
+              console.log('Failure');
+            }
+          })
           var obj = getResponseObject('Success', result);
           res.send(obj);
         })
