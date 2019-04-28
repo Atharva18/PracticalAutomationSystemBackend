@@ -73,14 +73,14 @@ app.post('/addfrom-csv', urlencodedParser, jsonParser, (req, res) => {
         else {
           for (var i = 0; i < json.length; i++) {
             delete json[i].roll_type,
-            json[i].id = result[0]._id,
-            json[i].status = "",
-            json[i].login_attempts = 0,
-            json[i].login_timestamp = "",
-            json[i].logout_timestamp = ""
+              json[i].id = result[0]._id,
+              json[i].status = "",
+              json[i].login_attempts = 0,
+              json[i].login_timestamp = "",
+              json[i].logout_timestamp = ""
           }
           database.db.collection('Users').insertMany(json, (err, result) => {
-            if(err) {
+            if (err) {
               var obj = getResponseObject('Failure', null);
             }
             else {
@@ -411,7 +411,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
     else {
       return getrole(results[0].id)
         .then((result) => {
-          database.db.collection('Users').findOneAndUpdate({ username: { $eq: username}, password: { $eq: password } }, { $set: { login_timestamp: now.toUTCString() } }, (err, result) => {
+          database.db.collection('Users').findOneAndUpdate({ username: { $eq: username }, password: { $eq: password } }, { $set: { login_timestamp: now.toUTCString() } }, (err, result) => {
             if (err) {
               console.log('Failure');
             }
@@ -700,8 +700,11 @@ app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, 
 
 app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Exam-student').find({ 'user': { $elemMatch: { 'id': req.body.id } } }, { projection: { '_id': 0, 'subject': 1 } }).toArray((err, result) => {
-    if(err) {
+    if (err) {
       var obj = getResponseObject('Failure', null);
+    }
+    else if (result.length == 0) {
+      var obj = getResponseObject('Student not enrolled.', null);
     }
     else {
       var obj = getResponseObject('Success', result);
