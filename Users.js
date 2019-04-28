@@ -698,4 +698,16 @@ app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, 
   })
 })
 
+app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
+  database.db.collection('Exam-student').find({ 'user': { $elemMatch: { 'id': req.body.id } } }, { projection: { '_id': 0, 'subject': 1 } }).toArray((err, result) => {
+    if(err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj);
+  })
+})
+
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
