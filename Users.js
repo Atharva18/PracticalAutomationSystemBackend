@@ -399,7 +399,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
   var now = new Date();
-  databaseObject.collection('Users').find({ username: { $eq: username }, password: { $eq: password } }, { projection: { _id: 0, id: 1 } }).toArray((err, results) => {
+  databaseObject.collection('Users').find({ username: { $eq: username }, password: { $eq: password } }, { projection: { _id: 1, id: 1 } }).toArray((err, results) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
       res.send(obj);
@@ -416,6 +416,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
               console.log('Failure');
             }
           })
+          result[0].id = results[0]._id;
           var obj = getResponseObject('Success', result);
           res.send(obj);
         })
@@ -431,7 +432,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
 var getrole = (id) => {
   return new Promise((resolve, reject) => {
     const databaseObject = database.db;
-    databaseObject.collection('Role').find({ _id: id }, { projection: { _id: 1, Type: 1 } }).toArray((err, result) => {
+    databaseObject.collection('Role').find({ _id: id }, { projection: { _id: 0, Type: 1 } }).toArray((err, result) => {
       if (err)
         reject("Failed to obtain ID");
       resolve(result);
