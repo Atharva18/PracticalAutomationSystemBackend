@@ -431,7 +431,7 @@ app.post('/findType', urlencodedParser, jsonParser, (req, res) => {
 var getrole = (id) => {
   return new Promise((resolve, reject) => {
     const databaseObject = database.db;
-    databaseObject.collection('Role').find({ _id: id }, { projection: { _id: 0, Type: 1 } }).toArray((err, result) => {
+    databaseObject.collection('Role').find({ _id: id }, { projection: { _id: 1, Type: 1 } }).toArray((err, result) => {
       if (err)
         reject("Failed to obtain ID");
       resolve(result);
@@ -626,8 +626,6 @@ var insertManyToDB = (id, req) => {
 
 //Add Problem Statement
 app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) => {
-
-  console.log('in Addproblem');
   return getunicode(req.body.course)
     .then((result) => {
       return insertToExamTopic(result[0].code, req)
@@ -649,9 +647,6 @@ var insertToExamTopic = (code, req) => {
       exam_id: code,
       course: req.body.course,
       statement: req.body.statement
-
-
-
     }
     database.db.collection('Exam-Topic').insertOne(document, (err, result) => {
       if (err) {
@@ -680,7 +675,6 @@ app.get('/findAll-exam', (req, res) => {
 
   });
 })
-
 
 app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Exam-student').find({ branch: { $eq: req.params.branch }, year: { $eq: req.params.year }, subject: { $eq: req.params.subject } }, { projection: { _id: 0, user: 1 } }).toArray((err, result) => {
