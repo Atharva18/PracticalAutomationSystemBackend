@@ -748,7 +748,7 @@ app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
     statement: req.body.statement,
     uploads: ''
   }
-  database.db.collection('Student-Topic').findOneAndUpdate({ statement: req.body.statement }, { $set: { id: req.body.id, course: req.body.course, uploads: '' } }, { upsert: true }, (err, result) => {
+  database.db.collection('Student-Topic').findOneAndUpdate({ id: req.body.id }, { $push: { questions: { course: req.body.course, statement: req.body.statement, uploads: '' } } }, { upsert: true }, (err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
@@ -761,7 +761,7 @@ app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
 
 //retrieve statement allocated to a student
 app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Student-Topic').findOne({ id: req.body.id, course: req.body.course }, { projection: { _id: 0, statement: 1 } }, (err, result) => {
+  database.db.collection('Student-Topic').find({ 'id': req.body.id, 'questions.course': req.body.course }, { projection: { '_id': 0, 'questions.statement': 1 } }).toArray((err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
