@@ -632,7 +632,7 @@ app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) =
       return insertToExamTopic(result[0].code, req)
     })
     .then((result) => {
-      var obj = getResponseObject("Problem statement added succesfully", result)
+      var obj = getResponseObject("Problem statement added successfully", result)
       res.send(obj)
     })
     .catch((err) => {
@@ -643,13 +643,7 @@ app.post('/problem-statement-create', urlencodedParser, jsonParser, (req, res) =
 
 var insertToExamTopic = (code, req) => {
   return new Promise((resolve, reject) => {
-    var document =
-    {
-      exam_id: code,
-      course: req.body.course,
-      statement: req.body.statement
-    }
-    database.db.collection('Exam-Topic').insertOne(document, (err, result) => {
+    database.db.collection('Exam-Topic').findOneAndUpdate({ statement: req.body.statement }, { $set: { exam_id: code, course: req.body.course } }, { upsert: true }, (err, result) => {
       if (err) {
         reject("Error");
       }
@@ -700,6 +694,22 @@ app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
     }
     else if (result.length == 0) {
       var obj = getResponseObject('Student not enrolled.', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj);
+  })
+})
+
+//returns start date and end date of a particular subject's exam
+app.post('/get-dates', urlencodedParser, jsonParser, (req, res) => {
+  database.db.collection('Exam').findOne({course: req.body.course}, { projection: { _id: 0, start_date: 1, end_date: 1 } }, (err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (result == null) {
+      var obj = getResponseObject('Exam not created.', null);
     }
     else {
       var obj = getResponseObject('Success', result);
