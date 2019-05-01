@@ -761,7 +761,7 @@ app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
 
 //retrieve statement allocated to a student
 app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Student-Topic').find({ 'id': req.body.id, 'questions.course': req.body.course }, { projection: { '_id': 0, 'questions.statement': 1 } }).toArray((err, result) => {
+  database.db.collection('Student-Topic').findOne({ 'id': req.body.id }, { projection: { '_id': 0, 'id': 0 } }, (err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
@@ -769,6 +769,14 @@ app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
       var obj = getResponseObject('No statement allocated.', null);
     }
     else {
+      var course = req.body.course;
+      for (var i = 0; i < result['questions'].length; i++) {
+        if (result['questions'][i].course == course) {
+          result['statement'] = result['questions'][i].statement;
+          break;
+        }
+      }
+      delete result['questions'];
       var obj = getResponseObject('Success', result);
     }
     res.send(obj);
