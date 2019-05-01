@@ -718,4 +718,19 @@ app.post('/get-dates', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
+app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
+  database.db.collection('Exam-Topic').find({ course: req.body.course }, { projection: {_id: 0, statement: 1} }).toArray((err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (result.length == 0) {
+      var obj = getResponseObject('No problem statements added.', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj);
+  })
+})
+
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
