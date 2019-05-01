@@ -534,6 +534,7 @@ app.post('/findSubject', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
+//add a new exam
 app.post('/exam-create', urlencodedParser, jsonParser, (req, res) => {
   return getunicode(req.body.course)
     .then((result) => {
@@ -549,6 +550,7 @@ app.post('/exam-create', urlencodedParser, jsonParser, (req, res) => {
     })
 })
 
+//function1 to add a new exam
 var getunicode = (course) => {
   return new Promise((resolve, reject) => {
     database.db.collection('Course').find({ course: course }).toArray((err, result) => {
@@ -560,6 +562,7 @@ var getunicode = (course) => {
   })
 }
 
+//function2 to add a new exam
 var insertToExamTable = (code, req) => {
   return new Promise((resolve, reject) => {
     var date = req.body.date;
@@ -671,6 +674,7 @@ app.get('/findAll-exam', (req, res) => {
   });
 })
 
+//find students enrolled for a particular subject
 app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Exam-student').find({ branch: { $eq: req.params.branch }, year: { $eq: req.params.year }, subject: { $eq: req.params.subject } }, { projection: { _id: 0, user: 1 } }).toArray((err, result) => {
     if (err) {
@@ -687,6 +691,7 @@ app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, 
   })
 })
 
+//find appeared subjects of a student
 app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Exam-student').find({ 'user': { $elemMatch: { 'id': req.body.id } } }, { projection: { '_id': 0, 'subject': 1 } }).toArray((err, result) => {
     if (err) {
@@ -718,6 +723,7 @@ app.post('/get-dates', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
+//display statements of a particular subject
 app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Exam-Topic').find({ course: req.body.course }, { projection: {_id: 0, statement: 1} }).toArray((err, result) => {
     if (err) {
@@ -725,6 +731,42 @@ app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
     }
     else if (result.length == 0) {
       var obj = getResponseObject('No problem statements added.', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj);
+  })
+})
+
+//store details about student and allocated problem statement
+app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
+  var document = 
+  {
+    id: req.body._id,
+    course: req.body.course,
+    statement: req.body.statement,
+    uploads: ''
+  }
+  database.db.collection('Student-Topic').findOneAndUpdate({ statement: req.body.statement }, { $set: { id: req.body.id, course: req.body.course, uploads: '' } }, { upsert: true }, (err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj)
+  })
+})
+
+//retrieve statement allocated to a student
+app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
+  database.db.collection('Student-Topic').findOne({ id: req.body.id, course: req.body.course }, { projection: { _id: 0, statement: 1 } }, (err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (result == null) {
+      var obj = getResponseObject('No statement allocated.', null);
     }
     else {
       var obj = getResponseObject('Success', result);
