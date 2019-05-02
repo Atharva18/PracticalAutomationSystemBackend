@@ -741,30 +741,23 @@ app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
 
 //store details about student and allocated problem statement
 app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Student-Topic').findOneAndUpdate({ id: req.body.id }, { $push: { questions: { course: req.body.course, statement: req.body.statement, changes: req.body.changes, uploads: '' } } }, { upsert: true }, (err, result) => {
-    if (err) {
-      var obj = getResponseObject('Failure', null);
-    }
-    else {
-      var obj = getResponseObject('Success', result);
-    }
-    res.send(obj)
-  })
-})
-
-//change statement
-app.post('/change-statement', urlencodedParser, jsonParser, (req, res) => {
-  //var index = -1;
   database.db.collection('Student-Topic').findOne({ id: req.body.id }, (err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
       res.send(obj);
     }
     else if (result == null) {
-      var obj = getResponseObject('No statement allocated.', null);
-      res.send(obj);
+      database.db.collection('Student-Topic').findOneAndUpdate({ id: req.body.id }, { $push: { questions: { course: req.body.course, statement: req.body.statement, changes: req.body.changes, uploads: '' } } }, { upsert: true }, (err, result) => {
+        if (err) {
+          var obj = getResponseObject('Failure', null);
+        }
+        else {
+          var obj = getResponseObject('Success', result);
+        }
+        res.send(obj)
+      })
     }
-    else {
+    else if (result) {
       for (var detail = 0; detail < result['questions'].length; detail++) {
         if (result['questions'][detail].course == req.body.course) {
           //index = detail;
