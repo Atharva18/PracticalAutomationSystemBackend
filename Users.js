@@ -769,6 +769,7 @@ app.post('/change-statement', urlencodedParser, jsonParser, (req, res) => {
         if (result['questions'][detail].course == req.body.course) {
           //index = detail;
           result['questions'][detail].changes = req.body.changes;
+          result['questions'][detail].statement = req.body.statement;
           break;
         }
       }
