@@ -793,6 +793,7 @@ app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
       for (var entry = 0; entry < result['questions'].length; entry++) {
         if (result['questions'][entry].course == course) {
           result['statement'] = result['questions'][entry].statement;
+          result['changes'] = result['questions'][entry].changes;
           break;
         }
       }
