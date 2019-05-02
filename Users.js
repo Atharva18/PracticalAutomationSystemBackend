@@ -709,7 +709,7 @@ app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
 
 //returns start date and end date of a particular subject's exam
 app.post('/get-dates', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Exam').findOne({course: req.body.course}, { projection: { _id: 0, start_date: 1, end_date: 1 } }, (err, result) => {
+  database.db.collection('Exam').findOne({ course: req.body.course }, { projection: { _id: 0, start_date: 1, end_date: 1 } }, (err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
@@ -725,7 +725,7 @@ app.post('/get-dates', urlencodedParser, jsonParser, (req, res) => {
 
 //display statements of a particular subject
 app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Exam-Topic').find({ course: req.body.course }, { projection: {_id: 0, statement: 1} }).toArray((err, result) => {
+  database.db.collection('Exam-Topic').find({ course: req.body.course }, { projection: { _id: 0, statement: 1 } }).toArray((err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
@@ -741,14 +741,7 @@ app.post('/find-stmt', urlencodedParser, jsonParser, (req, res) => {
 
 //store details about student and allocated problem statement
 app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
-  var document = 
-  {
-    id: req.body._id,
-    course: req.body.course,
-    statement: req.body.statement,
-    uploads: ''
-  }
-  database.db.collection('Student-Topic').findOneAndUpdate({ id: req.body.id }, { $push: { questions: { course: req.body.course, statement: req.body.statement, uploads: '' } } }, { upsert: true }, (err, result) => {
+  database.db.collection('Student-Topic').findOneAndUpdate({ id: req.body.id }, { $push: { questions: { course: req.body.course, statement: req.body.statement, changes: req.body.changes, uploads: '' } } }, { upsert: true }, (err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
@@ -770,9 +763,9 @@ app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
     }
     else {
       var course = req.body.course;
-      for (var i = 0; i < result['questions'].length; i++) {
-        if (result['questions'][i].course == course) {
-          result['statement'] = result['questions'][i].statement;
+      for (var entry = 0; entry < result['questions'].length; entry++) {
+        if (result['questions'][entry].course == course) {
+          result['statement'] = result['questions'][entry].statement;
           break;
         }
       }
@@ -780,6 +773,30 @@ app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
       var obj = getResponseObject('Success', result);
     }
     res.send(obj);
+  })
+})
+
+//find the number of changes requested by a student
+app.post('/find-student-changes', urlencodedParser, jsonParser, (req, res) => {
+  database.db.collection('Student-Topic').findOne({ id: req.body.id }, { projection: { _id: 0, id: 0 } }, (err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (result == null) {
+      var obj = getResponseObject('No problem statement allocated.', null);
+    }
+    else {
+      var course = req.body.course;
+      for (var entry = 0; entry < result['questions'].length; entry++) {
+        if (result['questions'][entry].course == course) {
+          result['changes'] = result['questions'][entry].changes;
+          break;
+        }
+      }
+      delete result['questions'];
+      var obj = getResponseObject('Success', result);
+      res.send(obj);
+    }
   })
 })
 
