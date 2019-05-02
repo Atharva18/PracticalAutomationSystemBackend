@@ -752,6 +752,39 @@ app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
+//change statement
+app.post('/change-statement', urlencodedParser, jsonParser, (req, res) => {
+  //var index = -1;
+  database.db.collection('Student-Topic').findOne({ id: req.body.id }, (err, result) => {
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+      res.send(obj);
+    }
+    else if (result == null) {
+      var obj = getResponseObject('No statement allocated.', null);
+      res.send(obj);
+    }
+    else {
+      for (var detail = 0; detail < result['questions'].length; detail++) {
+        if (result['questions'][detail].course == req.body.course) {
+          //index = detail;
+          result['questions'][detail].changes = req.body.changes;
+          break;
+        }
+      }
+      database.db.collection('Student-Topic').updateOne({ id: req.body.id }, { $set: result }, { upsert: true }, (err, results) => {
+        if (err) {
+          var obj = getResponseObject('Failure', null);
+        }
+        else {
+          var obj = getResponseObject('Success', results);
+        }
+        res.send(obj);
+      })
+    }
+  })
+})
+
 //retrieve statement allocated to a student
 app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Student-Topic').findOne({ 'id': req.body.id }, { projection: { '_id': 0, 'id': 0 } }, (err, result) => {
