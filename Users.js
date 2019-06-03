@@ -6,6 +6,7 @@ const multer = require('multer');
 const csv = require('csvtojson');
 const app = express();
 const path = require('path');
+const {spawn} = require('child_process');
 const port = 8023;
 var usbDetect = require('usb-detection');
 const jsonParser = bodyParser.json();
@@ -43,6 +44,35 @@ function getResponseObject(result, data) {
 
   return obj;
 }
+
+//detect USB
+/*app.post('/run', urlencodedParser, jsonParser, (req, res) => {
+  const subprocess = runScript()
+  console.log('Script running')
+  res.set('Content-Type', 'text/plain');
+  subprocess.stdout.pipe(res)
+  subprocess.stderr.pipe(res)  
+})
+
+//function 1 to detect USB
+function runScript() {
+  return spawn('python', [
+    "-u",
+    path.join(__dirname, 'detect_usb.py')
+  ]);
+}
+const subprocess = runScript()
+subprocess.stdout.on('data', (data) => {
+  console.log(`data:${data}`);
+});
+subprocess.stderr.on('data', (data) => {
+  console.log(`error:${data}`);
+});
+subprocess.stderr.on('close', () => {
+  console.log("Closed");
+});
+*/
+
 //Provide preview of CSV file before inserting in DB
 app.post('/csv-preview', upload.single('file'), (req, res) => {
   fileName = req.file.originalname;
@@ -693,7 +723,7 @@ app.get('/find-examinees/:branch/:year/:subject', urlencodedParser, jsonParser, 
 
 //find appeared subjects of a student
 app.post('/appeared-subjects', urlencodedParser, jsonParser, (req, res) => {
-  database.db.collection('Exam-student').find({ 'user': { $elemMatch: { 'id': req.body.id } } }, { projection: { '_id': 0, 'subject': 1 } }).toArray((err, result) => {
+  database.db.collection('Exam-student').find({ 'user': { $elemMatch: { 'id': req.body.id } } }, { projection: { '_id': 0, 'subject': 1, 'name': 1 } }).toArray((err, result) => {
     if (err) {
       var obj = getResponseObject('Failure', null);
     }
