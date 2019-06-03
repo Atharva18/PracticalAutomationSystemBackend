@@ -5,6 +5,7 @@ const cors = require('cors');
 const multer = require('multer');
 const csv = require('csvtojson');
 const app = express();
+const fs = require('fs-extra');
 const path = require('path');
 const {spawn} = require('child_process');
 const port = 8023;
@@ -856,6 +857,28 @@ app.post('/find-student-changes', urlencodedParser, jsonParser, (req, res) => {
       res.send(obj);
     }
   })
+})
+
+//student upload code
+let code = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, callback) => {
+      let batch = req.body.batchname;
+      console.log(req.body.batchname);
+      let dir = './codes/' + batch;
+      fs.mkdirsSync(dir);
+      callback(null, dir);
+    },
+    filename: (req, file, callback) => {
+      callback(null, file.originalname);
+    }
+  })
+})
+
+app.post('/upload-code', code.single('file'), (req, res) => {
+  console.log(req.body)
+  var obj = getResponseObject('Success', null);
+  res.send(obj);
 })
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
