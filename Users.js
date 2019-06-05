@@ -7,7 +7,7 @@ const csv = require('csvtojson');
 const app = express();
 const fs = require('fs-extra');
 const path = require('path');
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
 const port = 8023;
 var usbDetect = require('usb-detection');
 const jsonParser = bodyParser.json();
@@ -863,9 +863,10 @@ app.post('/find-student-changes', urlencodedParser, jsonParser, (req, res) => {
 let code = multer({
   storage: multer.diskStorage({
     destination: (req, file, callback) => {
-      let batch = req.body.batchname;
-      console.log(req.body.batchname);
-      let dir = './codes/' + batch;
+      let batch = req.headers.batchname
+      console.log(batch)
+      //console.log(req.body.batchname);
+      let dir = `./codes/${batch}`
       fs.mkdirsSync(dir);
       callback(null, dir);
     },
@@ -875,10 +876,40 @@ let code = multer({
   })
 })
 
-app.post('/upload-code', code.single('file'), (req, res) => {
-  console.log(req.body)
+app.post('/upload-code', code.array('files[]'), (req, res) => {
   var obj = getResponseObject('Success', null);
   res.send(obj);
+})
+
+// function 1 to find batch
+var getexamid = (exam_name) => {
+  return new Promise((resolve, reject) => {
+    database.db.collection('Exam').find({ exam_name: exam_name }).toArray((err, result) => {
+      if (err) {
+        reject("Failed to obtain University Subject code.")
+      }
+      resolve(result)
+    })
+  })
+}
+
+// find the batches 
+app.get('/find-batch/:exam_name', urlencodedParser, jsonParser, (req, res) => {
+  var exam_name = req.params.exam_name;
+  getexamid(exam_name).then((result) => {
+    database.db.collection('Exam-student').find({ examid: result[0]._id }, { projection: { _id: 0, name: 1 } }).toArray((err, result) => {
+      if (err) {
+        var obj = getResponseObject('Failure', null);
+      }
+      else if (result.length == 0) {
+        var obj = getResponseObject('batches not found', null);
+      }
+      else {
+        var obj = getResponseObject('Success', result);
+      }
+      res.send(obj);
+    })
+  })
 })
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
