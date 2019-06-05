@@ -810,7 +810,7 @@ app.post('/add-student-topic', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
-//retrieve statement allocated to a student
+//retrieve statement allocated to a student along with upload status
 app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
   database.db.collection('Student-Topic').findOne({ 'id': req.body.id }, { projection: { '_id': 0, 'id': 0 } }, (err, result) => {
     if (err) {
@@ -825,6 +825,7 @@ app.post('/find-student-topic', urlencodedParser, jsonParser, (req, res) => {
         if (result['questions'][entry].course == course) {
           result['statement'] = result['questions'][entry].statement;
           result['changes'] = result['questions'][entry].changes;
+          result['uploads']=result['questions'][entry].uploads;
           break;
         }
       }
@@ -897,7 +898,7 @@ var getexamid = (exam_name) => {
 app.get('/find-batch/:exam_name', urlencodedParser, jsonParser, (req, res) => {
   var exam_name = req.params.exam_name;
   getexamid(exam_name).then((result) => {
-    database.db.collection('Exam-student').find({ examid: result[0]._id }, { projection: { _id: 0, name: 1 } }).toArray((err, result) => {
+    database.db.collection('Exam-student').find({ examid: result[0]._id }, { projection: { _id: 0, name: 1 ,subject: 1} }).toArray((err, result) => {
       if (err) {
         var obj = getResponseObject('Failure', null);
       }
@@ -912,4 +913,25 @@ app.get('/find-batch/:exam_name', urlencodedParser, jsonParser, (req, res) => {
   })
 })
 
+ //Find all students under batches
+ app.get('/find-batch_students/:name/:subject', urlencodedParser, jsonParser, (req, res) => {
+  var batch_name=req.params.name;
+  var subject=req.params.subject;
+  
+         database.db.collection('Exam-Student').find({ subject: { $eq: subject },name:{$eq: batch_name}},  { projection: { _id: 0, user: 1 } }).toArray((err, result) => {
+          
+          if (err) {
+          var obj = getResponseObject('Failure', null);
+        }
+        else if (result.length == 0) {
+          var obj = getResponseObject('empty batch found', null);
+        }
+        else {
+          var obj = getResponseObject('Success', result);
+        }
+        res.send(obj);
+      })
+    })
+
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
+
