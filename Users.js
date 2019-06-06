@@ -895,7 +895,7 @@ var getexamid = (exam_name) => {
 }
 
 // find the batches 
-app.get('/find-batch/:exam_name', urlencodedParser, jsonParser, (req, res) => {
+app.post('/find-batch', urlencodedParser, jsonParser, (req, res) => {
   var exam_name = req.params.exam_name;
   getexamid(exam_name).then((result) => {
     database.db.collection('Exam-student').find({ examid: result[0]._id }, { projection: { _id: 0, name: 1 ,subject: 1} }).toArray((err, result) => {
@@ -914,7 +914,7 @@ app.get('/find-batch/:exam_name', urlencodedParser, jsonParser, (req, res) => {
 })
 
  //Find all students under batches
- app.get('/find-batch_students/:name/:subject', urlencodedParser, jsonParser, (req, res) => {
+ app.post('/find-batch_students', urlencodedParser, jsonParser, (req, res) => {
   var batch_name=req.params.name;
   var subject=req.params.subject;
   
