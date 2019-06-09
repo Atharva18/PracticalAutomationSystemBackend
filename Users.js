@@ -896,7 +896,7 @@ var getexamid = (exam_name) => {
 
 // find the batches 
 app.post('/find-batch', urlencodedParser, jsonParser, (req, res) => {
-  var exam_name = req.params.exam_name;
+  var exam_name = req.body.exam_name;
   getexamid(exam_name).then((result) => {
     database.db.collection('Exam-student').find({ examid: result[0]._id }, { projection: { _id: 0, name: 1 ,subject: 1} }).toArray((err, result) => {
       if (err) {
@@ -915,23 +915,22 @@ app.post('/find-batch', urlencodedParser, jsonParser, (req, res) => {
 
  //Find all students under batches
  app.post('/find-batch_students', urlencodedParser, jsonParser, (req, res) => {
-  var batch_name=req.params.name;
-  var subject=req.params.subject;
-  
-         database.db.collection('Exam-Student').find({ subject: { $eq: subject },name:{$eq: batch_name}},  { projection: { _id: 0, user: 1 } }).toArray((err, result) => {
-          
-          if (err) {
-          var obj = getResponseObject('Failure', null);
-        }
-        else if (result.length == 0) {
-          var obj = getResponseObject('empty batch found', null);
-        }
-        else {
-          var obj = getResponseObject('Success', result);
-        }
-        res.send(obj);
-      })
-    })
+  var batch_name = req.body.batch_name;
+  var subject = req.body.subject;
+  database.db.collection('Exam-student').find({ subject: { $eq: subject }, name: { $eq: batch_name } }, { projection: { _id: 0, user: 1 } }).toArray((err, result) => {
+
+    if (err) {
+      var obj = getResponseObject('Failure', null);
+    }
+    else if (result.length == 0) {
+      var obj = getResponseObject('empty batch found', null);
+    }
+    else {
+      var obj = getResponseObject('Success', result);
+    }
+    res.send(obj);
+  })
+})
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
 
