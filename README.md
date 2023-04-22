@@ -1,6 +1,6 @@
 Backend for Practical Automation System:
 
-Collections in Mongo:
+Tables to be created in MongoDB:
 
 1. Users (fname, lname, id, username, password, email, branch, year, status, login_attempts, login_timestamp, logout_timestamp)
 2. Role (Type)
